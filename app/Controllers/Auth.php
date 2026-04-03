@@ -1,111 +1,158 @@
 <?php
-
 namespace App\Controllers;
+use App\Models\ContactModel;
+use CodeIgniter\Controller;
 
-use App\Controllers\BaseController;
-use CodeIgniter\HTTP\ResponseInterface;
-use App\Models\UsersModel;
-
+use App\Models\UserModel; // Importer le modèle UserModel pour pouvoir l'utiliser dans le controleur Auth
 
 class Auth extends BaseController
 {
-     private $model;
+    private $model;
 
     public function __construct()
     {
-        $this->model = new UsersModel();
+        $this->model = new UserModel();
     }
-    
+
+
+
+    // Fonction pour afficher la page d'accueil avec la liste des users
     public function index()
     {
-        //
-    }
-    
-    public function register()
-    {
-        return view('auth/register');
-
+        $data = [
+            'users' => $this->model->getUser(),
+            'titre' => 'Liste des users',
+        ];
+        return view('auth/listeUser', $data); // $data 2ème paramètre = données transmises à la vue
     }
 
-    public function login()
-    {
-        return view('auth/login');
 
-    }
 
+    // Fonction pour traiter les données du formulaire d'inscription et les insérer en BDD
     public function store()
     {
-       $data = $this->request->getPost(['nom', 'prenom', 'email', 'mdp', 'mdpVerif']);
-    // vérification des règles de validation
-    if (! $this->validateData($data, [
-    'nom' => 'required|max_length[30]|min_length[3]|alpha_space',
-    'prenom' => 'required|max_length[30]|min_length[2]|alpha_space',
-    'email' => 'required|valid_email|is_unique[users.email]',
-    'mdp' => 'required|min_length[6]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
-    'mdpVerif' => 'required|matches[mdp]'
-    ])) {
-
-    return redirect()
+        $data = $this->request->getPost(['nom', 'prenom', 'email', 'mdp1', 'mdp2']);
+        // vérification des règles de validation
+        if (
+            !$this->validateData($data, [
+                'nom' => 'required|max_length[30]|min_length[3]|alpha_space',
+                'prenom' => 'required|max_length[30]|min_length[2]|alpha_space',
+                'email' => 'required|valid_email',
+                'mdp1' => 'required|min_length[8]',
+                'mdp2' => 'required|matches[mdp1]',
+            ])
+        ) {
+            // si la validation échoue
+            return redirect()
                 ->back()
                 ->withInput()
                 ->with('errors', $this->validator->getErrors());
-    }
+        }
 
-    // récupération des données validées et nettoyées et sauvegarde des données
-    $postValid = $this->validator->getValidated();
-    $res=$this->model->saveUser([
-        'nom' => strtoupper($postValid['nom']),
-        'prenom'=> ucfirst(strtolower($postValid['prenom']) ),
-        'email' => $postValid['email'],
-        'password' => password_hash($postValid['mdp'], PASSWORD_DEFAULT),
-    ]); // strtoupper() et ucfirst pour respecter la casse en BD
-    if ($res)
-    {
-    $data['titre'] = 'Inscription';
-    $data['message'] = 'Utilisateur ajouté avec succès.';
-    return view('auth/register', $data);           
-    }
-    else {
-        return redirect()
+        // récupération des données validées et nettoyées et sauvegarde des données
+        $postValid = $this->validator->getValidated();
+        $res = $this->model->saveUser([
+            'nom' => strtoupper($postValid['nom']),
+            'prenom' => ucfirst(strtolower($postValid['prenom'])),
+            'email' => strtolower($postValid['email']),
+            'password' => password_hash($postValid['mdp1'], PASSWORD_DEFAULT), // Hash du mot de passe pour plus de sécurité
+        ]); // strtoupper() et ucfirst pour respecter la casse en BD
+
+        if ($res) {
+            $data['user'] = $this->model->getUser();
+            $data['titre'] = 'Liste des users';
+            $data['success'] = 'User ajouté avec succès !';
+            return view('auth/login', $data);
+        } else {
+            return redirect()
                 ->back()
                 ->withInput()
                 ->with('errors', ['db_error' => 'Erreur lors de l\'ajout en base de données']);
+        }
     }
-}
 
-public function loginAttempt()
+
+
+    // Fonction pour afficher la page d'inscription
+    public function register()
     {
-       $data = $this->request->getPost(['email', 'mdp']);
-    if (! $this->validateData($data, [
-    'email' => 'required|valid_email',
-    'mdp' => 'required|min_length[6]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/]',
-    ])) {
-    return redirect()
+        return view('auth/register');
+    }
+
+
+
+    // Fonction pour afficher la page de connexion après l'inscription d'un user
+    public function login()
+    {
+        return view('auth/login');
+    }
+
+
+
+    // Fonction pour supprimer un user de la liste des users
+    public function delete($num)
+    {
+        $this->model->delete($num);
+        $data['users'] = $this->model->getUser();
+        return view('auth/listeUser', $data);
+    }
+
+
+
+    // Fonction pour traiter les données du formulaire de connexion et connecter le user
+    public function loginAttempt()
+    {
+        $data = $this->request->getPost(['email', 'mdp']);
+
+        if (
+            !$this->validateData($data, [
+                'email' => 'required|valid_email',
+                'mdp' => 'required|min_length[8]',
+            ])
+        ) {
+            return redirect()
                 ->back()
                 ->withInput()
                 ->with('errors', $this->validator->getErrors());
-    }
-    
-    $postValid = $this->validator->getValidated();
-    $user = $this->model->getUserByEmail($postValid['email']);
-    if(!$user || !password_verify($postValid['mdp'], $user['password'])){
-        return redirect()
+        }
+
+        $postValid = $this->validator->getValidated();
+
+        $user = $this->model->getUserByEmail(strtolower($postValid['email']));
+
+        if (!$user) {
+            return redirect()
                 ->back()
                 ->withInput()
-                ->with('errors', $this->validator->getErrors());
-    }
-    session()->regenerate();
-    
-    session()->set([
+                ->with('errors', ['login' => 'Email ou mot de passe incorrect.']);
+        }
+
+        if (!password_verify($postValid['mdp'], $user['password'])) {  // Verification du mot de passe
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('errors', ['login' => 'Email ou mot de passe incorrect.']);
+        }
+
+        session()->set([
         'user_id'      => $user['id'],
         'logged_at'    => time(),
+        'isLoggedIn' => true,
         ]);
 
-    return redirect()->to(base_url('contacts'));
-}
 
-public function deconnexion(){
-    session()->destroy();
-    return redirect()->to(base_url('auth/login'));
-}
+        return redirect()->to('/contacts');
+        session->regenerate();
+    }
+
+
+
+    // Fonction pour déconnecter un user
+    public function logout()
+    {
+        session()->destroy(); // supprime toute la session
+
+        return redirect()->to('/auth/login');
+    }
+
 }

@@ -22,6 +22,7 @@ class ContactsSeeder extends Seeder
                 'email' => $faker->email,
                 'telephone' => $faker->phoneNumber,
                 'poste' => $faker->jobTitle,
+
             ];
         }
 

@@ -1,3 +1,4 @@
+// views/pages/accueil.php
 <?= $this->extend('templates/default') ?>
 <?= $this->section('page_title') ?>Accueil<?= $this->endSection() ?>
 <?= $this->section('titre') ?>Accueil<?= $this->endSection() ?>

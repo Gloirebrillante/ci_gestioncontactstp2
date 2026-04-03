@@ -1,21 +1,36 @@
 <?= $this->extend('templates/default') ?>
-<?= $this->section('page_title') ?>Informations sur l'utilisateur<?= $this->endSection() ?>
-<?= $this->section('titre') ?>Informations sur l'utilisateur<?= $this->endSection() ?>
-<?= $this->section('contenu') ?>
-<?= session()->getFlashdata('error') ?>
-<div>
-    <?= validation_list_errors() ?>
-        <?= csrf_field() ?>
-        <label for="nom">Nom</label>
-        <input type="input" name="nom" value="<?= $user['nom'] ?>" readonly>
-        <br>
-        <label for="prenom">Prénom</label>
-        <input type="input" name="prenom" value="<?= $user['prenom'] ?>" readonly>
-        <br>
-        <label for="email">Email</label>
-        <input type="email" name="email" value="<?= $user['email'] ?>" readonly>
-        <br>
 
-        <p>Membre depuis le <?= $user['created_at'] ?></p>
-</div>
+<?= $this->section('page_title') ?>Profil<?= $this->endSection() ?>
+<?= $this->section('titre') ?>Mon profil<?= $this->endSection() ?>
+
+<?= $this->section('contenu') ?>
+
+<?= session()->getFlashdata('errors') ?>
+
+<h2>Informations de l'utilisateur</h2>
+
+<form>
+
+    <label>Nom :</label>
+    <input type="text" value="<?= esc($user['nom']) ?>" readonly><!-- En lecture seule pour éviter les modifications -->
+
+    <br>
+    <br>
+
+    <label>Prénom :</label>
+    <input type="text" value="<?= esc($user['prenom']) ?>" readonly>
+
+    <br>
+    <br>
+
+    <label>Email :</label>
+    <input type="email" value="<?= esc($user['email']) ?>" readonly>
+
+    <br>
+    <br>
+
+    <p> Membre depuis le </p><?= esc($newDate = date("d/m/Y", strtotime($user['created_at']))) ?>
+
+</form>
+
 <?= $this->endSection() ?>

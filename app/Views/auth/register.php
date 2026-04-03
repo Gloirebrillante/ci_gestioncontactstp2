@@ -1,29 +1,42 @@
 <?= $this->extend('templates/default') ?>
-<?= $this->section('page_title') ?>Inscription<?= $this->endSection() ?>
-<?= $this->section('titre') ?>Inscription<?= $this->endSection() ?>
+<?= $this->section('page_title') ?>Accueil<?= $this->endSection() ?>
+<?= $this->section('titre') ?>Accueil<?= $this->endSection() ?>
 <?= $this->section('contenu') ?>
+
 <?= session()->getFlashdata('error') ?>
 <div>
     <?= validation_list_errors() ?>
 
-     <form action="<?= base_url('auth/register') ?>" method="post">
+    <form action="<?= base_url('auth/register') ?>" method="post">
         <?= csrf_field() ?>
+
         <label for="nom">Nom</label>
         <input type="input" name="nom" value="<?= old('nom') ?>">
+
         <br>
+
         <label for="prenom">Prénom</label>
         <input type="input" name="prenom" value="<?= old('prenom') ?>">
-        <br> 
+
+        <br>
+
         <label for="email">Email</label>
-        <input type="email" name="email" value="<?= old('email') ?>">
+        <input type="input" name="email" value="<?= old('email') ?>">
+
         <br>
-        <label for="mdp">Mot de passe</label>
-        <input type="password" name="mdp" value="<?= old('mdp') ?>">
+
+        <label for="mdp1">Mot de passe</label>
+        <input type="password" name="mdp1" value="<?= old('mdp1') ?>">
+
+<br>
+
+        <label for="mdp2">Mot de passe</label>
+        <input type="password" name="mdp2" value="<?= old('mdp2') ?>">
+        
         <br>
-        <label for="mdpVerif">Confirmer le mot de passe</label>
-        <input type="password" name="mdpVerif" value="<?= old('mdpVerif') ?>">
-        <br>
-        <input type="submit" name="submit" value="Créer un contact">
+
+        <input type="submit" name="submit" value="Créer un user">
     </form>
 </div>
+
 <?= $this->endSection() ?>

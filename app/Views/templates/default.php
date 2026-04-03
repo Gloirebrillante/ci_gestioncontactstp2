@@ -24,21 +24,43 @@
 
 
 
-           <section id="menu">
+            <section>
+
                 <nav class="navbar navbar-expand-lg navbar-light bg-light">
                     <a class="navbar-brand" href="#">CI4 tp2</a>
                     <ul class="navbar-nav mr-auto">
-                        <?php if(session()->get('user_id')): ?>
-                        <li class="nav-item"><a class="nav-link" href="<?= base_url('contacts') ?>">Vos contacts</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= base_url('contacts/create') ?>">Créer un contact</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= base_url('users/profil') ?>">Votre profil</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/logout') ?>">Déconnexion</a></li>
-                        <?php else: ?>
-                        <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/register') ?>">Inscription</a></li>
-                        <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/login') ?>">Connexion</a></li>
+
+
+
+                        <?php if (session()->get('isLoggedIn')): ?>
+                            <!-- Si l'utilisateur est connecté, on affiche en plus un bouton de déconnexion et de profil -->
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('users/profil') ?>">Profil</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('contacts') ?>">Contacts</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('contacts/create') ?>">Créer un
+                                    contact</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/listeUser') ?>">Users</a></li>
+
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/logout') ?>">Déconnexion</a>
+                            </li>
+
                         <?php endif; ?>
+
+                        <?php if (!session()->get('isLoggedIn')): ?>
+                            <!-- Si l'utilisateur n'est pas connecté, on affiche en plus un bouton d'inscription et de connexion -->
+
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/register') ?>">Inscription</a>
+                            </li>
+
+                            <li class="nav-item"><a class="nav-link" href="<?= base_url('auth/login') ?>">Connexion</a></li>
+
+                        <?php endif; ?>
+
                     </ul>
                 </nav>
+
             </section>
 
 
