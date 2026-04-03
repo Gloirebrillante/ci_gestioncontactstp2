@@ -5,7 +5,7 @@ use App\Controllers\Pages;
 use App\Controllers\Contacts;
 use App\Controllers\Auth;
 use App\Controllers\Users;
-
+use App\Controllers\Api\Produits;
 
 /**
  * @var RouteCollection $routes
@@ -23,6 +23,8 @@ $routes->get('/', [Auth::class, 'login']);
     $routes->get('auth/logout', [Auth::class,'deconnexion'],['filter'=>'auth']);
     $routes->get('auth/login', [Auth::class,'login']);
     $routes->post('auth/login', [Auth::class,'loginAttempt']);
+    $routes->post('produits', [Produits::class, 'create']);
+    $routes->resource('produits', ['controller' => 'Api\Produits']);
 
 
 

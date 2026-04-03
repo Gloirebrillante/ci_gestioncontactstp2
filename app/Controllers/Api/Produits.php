@@ -18,7 +18,13 @@ class Produits extends ResourceController
      */
     public function index()
     {
-        //
+        $produits = $this->model->findAll();
+    return $this->respond([
+        'status'   => true,
+        'message'  => 'Liste des produits',
+        'produits' => $produits,
+    ], 200); 
+
     }
 
     /**
@@ -30,7 +36,20 @@ class Produits extends ResourceController
      */
     public function show($id = null)
     {
-        //
+        $produits = $this->model->find($id);
+
+        if(empty($produits)){
+            return $this->respond([
+                'status'   => false,
+                'message'  => 'Aucun produit trouvé pour l\'id '.$id,
+            ], 404); 
+        }else{
+        return $this->respond([
+        'status'   => true,
+        'message'  => 'Information du produit n°'.$id,
+        'produits' => $produits,
+    ], 200); 
+    }
     }
 
 
@@ -42,7 +61,8 @@ class Produits extends ResourceController
      */
     public function create()
     {
-        //
+        $json= $this->request->getJson(true); 
+        print_r ($json);
     }
 
 
